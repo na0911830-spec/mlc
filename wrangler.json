@@ -1,0 +1,10 @@
+{
+  "name": "muzo-lyrics-canvas-worker",
+  "main": "src/index.js",
+  "compatibility_date": "2024-06-01",
+  "vars": {
+    "DB_URL": "mysql://2YL56v9y4gRssmf.root:T2K2TPS9zRjTStjw@gateway01.ap-southeast-1.prod.aws.tidbcloud.com/test",
+    "HF_TOKEN": "",
+    "BUCKET_ID": "allnewuser/lyrics"
+  }
+}

@@ -1,0 +1,620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muzo Lyrics & Canvas Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Outfit:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #090a0f;
+      --bg-card: rgba(18, 20, 28, 0.7);
+      --accent: #00ff66;
+      --accent-glow: rgba(0, 255, 102, 0.3);
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --border-color: rgba(255, 255, 255, 0.08);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: 'Inter', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Ambient background glows */
+    .glow-bg {
+      position: fixed;
+      top: -10%;
+      left: 10%;
+      width: 40vw;
+      height: 40vw;
+      background: radial-gradient(circle, rgba(0, 255, 102, 0.08) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    .glow-bg-2 {
+      position: fixed;
+      bottom: -10%;
+      right: 10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(circle, rgba(0, 150, 255, 0.05) 0%, transparent 70%);
+      pointer-events: none;
+      z-index: -1;
+    }
+
+    header {
+      padding: 2.5rem 2rem;
+      text-align: center;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    header h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 3rem;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+      background: linear-gradient(135deg, #ffffff 30%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.5rem;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      font-weight: 300;
+    }
+
+    main {
+      flex: 1;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+      padding: 0 2rem 4rem 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 3rem;
+    }
+
+    /* Search Bar */
+    .search-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 1.2rem 1.5rem 1.2rem 3.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 50px;
+      color: var(--text-main);
+      font-size: 1.1rem;
+      font-family: inherit;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .search-input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow), 0 10px 30px rgba(0, 0, 0, 0.4);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1.5rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+      width: 20px;
+      height: 20px;
+      transition: color 0.3s;
+    }
+
+    .search-input:focus + .search-icon {
+      color: var(--accent);
+    }
+
+    /* Section Headers */
+    .section-title {
+      font-family: 'Outfit', sans-serif;
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-title::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-color);
+    }
+
+    /* Grid of songs */
+    .songs-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .song-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 1.5rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      backdrop-filter: blur(12px);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 160px;
+    }
+
+    .song-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--accent);
+      box-shadow: 0 12px 24px rgba(0, 255, 102, 0.05);
+    }
+
+    .song-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, rgba(0, 255, 102, 0.03) 0%, transparent 100%);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    .song-card:hover::before {
+      opacity: 1;
+    }
+
+    .song-title-text {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--text-main);
+      margin-bottom: 0.25rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .song-artist {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .song-meta-tags {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .meta-tag {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.25rem 0.6rem;
+      border-radius: 4px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .tag-lyrics {
+      background: rgba(0, 255, 102, 0.1);
+      color: var(--accent);
+      border: 1px solid rgba(0, 255, 102, 0.2);
+    }
+
+    .tag-canvas {
+      background: rgba(0, 150, 255, 0.1);
+      color: #0096ff;
+      border: 1px solid rgba(0, 150, 255, 0.2);
+    }
+
+    /* Active Detail Panel */
+    .detail-container {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 24px;
+      padding: 2.5rem;
+      backdrop-filter: blur(16px);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+    }
+
+    @media (min-width: 768px) {
+      .detail-container {
+        grid-template-columns: 1fr 340px;
+      }
+    }
+
+    .lyrics-panel {
+      display: flex;
+      flex-direction: column;
+      max-height: 600px;
+    }
+
+    .lyrics-header {
+      margin-bottom: 1.5rem;
+    }
+
+    .lyrics-header h2 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 2.2rem;
+      font-weight: 800;
+      margin-bottom: 0.25rem;
+    }
+
+    .lyrics-header p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+    }
+
+    .lyrics-body {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 1rem;
+      font-size: 1.15rem;
+      line-height: 1.8;
+      font-weight: 400;
+      white-space: pre-line;
+      color: #d1d5db;
+    }
+
+    /* Custom Scrollbar for Lyrics */
+    .lyrics-body::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .lyrics-body::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    .lyrics-body::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+    }
+
+    .lyrics-body::-webkit-scrollbar-thumb:hover {
+      background: var(--accent);
+    }
+
+    .canvas-panel {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .canvas-wrapper {
+      width: 100%;
+      aspect-ratio: 9 / 16;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #000;
+      border: 1px solid var(--border-color);
+      position: relative;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+    }
+
+    .canvas-video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .canvas-fallback {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 2rem;
+      background: linear-gradient(180deg, #11131a 0%, #06070a 100%);
+    }
+
+    .canvas-fallback svg {
+      width: 48px;
+      height: 48px;
+      color: rgba(255, 255, 255, 0.15);
+      margin-bottom: 1rem;
+    }
+
+    .no-selection {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+      border: 1px dashed var(--border-color);
+      border-radius: 20px;
+      font-size: 1.1rem;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Shimmer Loading State */
+    .shimmer {
+      background: linear-gradient(90deg, var(--bg-card) 25%, rgba(255, 255, 255, 0.05) 50%, var(--bg-card) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Toast notification */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: #10b981;
+      color: #fff;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+      z-index: 1000;
+      transform: translateY(150%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+    }
+
+    .toast.show {
+      transform: translateY(0);
+    }
+  </style>
+</head>
+<body>
+  <div class="glow-bg"></div>
+  <div class="glow-bg-2"></div>
+
+  <header>
+    <h1>Muzo Fallback Explorer</h1>
+    <p>Explore pre-existing synced lyrics and canvas loops directly cached in the database.</p>
+  </header>
+
+  <main>
+    <div class="search-wrapper">
+      <input type="text" class="search-input" id="searchBar" placeholder="Search cached songs by name or artist...">
+      <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+      </svg>
+    </div>
+
+    <div>
+      <h3 class="section-title">Featured Songs</h3>
+      <div class="songs-grid" id="songsGrid">
+        <!-- JS rendered cards -->
+      </div>
+    </div>
+
+    <div>
+      <h3 class="section-title">Lyrics & Canvas Player</h3>
+      <div id="noSelection" class="no-selection">
+        Select a song from above or search to load its lyrics and canvas loop.
+      </div>
+      <div id="detailContainer" class="detail-container hidden">
+        <div class="lyrics-panel">
+          <div class="lyrics-header">
+            <h2 id="detailTitle">Song Title</h2>
+            <p id="detailArtist">Artist Name</p>
+          </div>
+          <div class="lyrics-body" id="lyricsBody">
+            <!-- Lyrics content -->
+          </div>
+        </div>
+        <div class="canvas-panel">
+          <div class="canvas-wrapper">
+            <video class="canvas-video hidden" id="canvasVideo" autoplay loop muted playsinline></video>
+            <div class="canvas-fallback" id="canvasFallback">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+              </svg>
+              <p style="font-size: 0.9rem; font-weight: 600;">No Canvas Loop</p>
+              <p style="font-size: 0.8rem; margin-top: 0.25rem;">Only lyrics are cached for this track.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="toast" id="toast">
+    <svg style="width: 20px; height: 20px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <span id="toastMsg">Lyrics loaded successfully</span>
+  </div>
+
+  <script>
+    const searchBar = document.getElementById('searchBar');
+    const songsGrid = document.getElementById('songsGrid');
+    const noSelection = document.getElementById('noSelection');
+    const detailContainer = document.getElementById('detailContainer');
+    const detailTitle = document.getElementById('detailTitle');
+    const detailArtist = document.getElementById('detailArtist');
+    const lyricsBody = document.getElementById('lyricsBody');
+    const canvasVideo = document.getElementById('canvasVideo');
+    const canvasFallback = document.getElementById('canvasFallback');
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+
+    let allSongs = [];
+
+    // Fetch initial featured songs
+    async function loadFeaturedSongs() {
+      songsGrid.innerHTML = Array(4).fill(0).map(() => `
+        <div class="song-card shimmer">
+          <div>
+            <div style="height: 1.25rem; width: 70%; background: rgba(255,255,255,0.05); margin-bottom: 0.5rem; border-radius:4px;"></div>
+            <div style="height: 0.95rem; width: 40%; background: rgba(255,255,255,0.05); border-radius:4px;"></div>
+          </div>
+        </div>
+      `).join('');
+
+      try {
+        const res = await fetch('/api/search?limit=12');
+        if (res.ok) {
+          allSongs = await res.json();
+          renderSongs(allSongs);
+        } else {
+          songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Failed to load cached songs.</p>';
+        }
+      } catch (err) {
+        songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Error connecting to fallback worker.</p>';
+      }
+    }
+
+    function renderSongs(songs) {
+      if (songs.length === 0) {
+        songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">No songs found in database.</p>';
+        return;
+      }
+
+      songsGrid.innerHTML = songs.map(song => {
+        const hasLyrics = !!song.lyrics_sources;
+        const hasCanvas = !!song.canvas_sources;
+        return `
+          <div class="song-card" onclick="selectSong('${song.id}', '${encodeURIComponent(song.name)}', '${encodeURIComponent(song.artists)}')">
+            <div>
+              <div class="song-title-text" title="${song.name}">${song.name}</div>
+              <div class="song-artist" title="${song.artists}">${song.artists || 'Unknown Artist'}</div>
+            </div>
+            <div class="song-meta-tags">
+              ${hasLyrics ? '<span class="meta-tag tag-lyrics">Lyrics</span>' : ''}
+              ${hasCanvas ? '<span class="meta-tag tag-canvas">Canvas</span>' : ''}
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    async function selectSong(id, name, artist) {
+      name = decodeURIComponent(name);
+      artist = decodeURIComponent(artist);
+      
+      // Reset view
+      noSelection.classList.add('hidden');
+      detailContainer.classList.remove('hidden');
+      detailTitle.textContent = name;
+      detailArtist.textContent = artist;
+      lyricsBody.innerHTML = `<span style="color: var(--text-muted)">Loading lyrics...</span>`;
+      canvasVideo.classList.add('hidden');
+      canvasFallback.classList.remove('hidden');
+
+      // Fetch lyrics
+      try {
+        const lyricsRes = await fetch(`/api/lyrics/${id}?name=${encodeURIComponent(name)}&artist=${encodeURIComponent(artist)}`);
+        if (lyricsRes.ok) {
+          const data = await lyricsRes.json();
+          // Prefer syncedLyrics if available, else plainLyrics
+          let text = data.syncedLyrics || data.plainLyrics || "No lyric content available.";
+          // Strip timestamp headers if user wants plain look, or keep them
+          lyricsBody.innerHTML = text;
+          showToast("Lyrics loaded successfully!");
+        } else {
+          lyricsBody.innerHTML = `<span style="color: #ef4444">Failed to load lyrics from Hugging Face storage.</span>`;
+        }
+      } catch (e) {
+        lyricsBody.innerHTML = `<span style="color: #ef4444">Error loading lyrics.</span>`;
+      }
+
+      // Fetch canvas
+      try {
+        const canvasRes = await fetch(`/api/canvas?id=${id}&name=${encodeURIComponent(name)}&artist=${encodeURIComponent(artist)}`);
+        if (canvasRes.ok) {
+          const data = await canvasRes.json();
+          if (data.url) {
+            canvasVideo.src = data.url;
+            canvasVideo.classList.remove('hidden');
+            canvasFallback.classList.add('hidden');
+          }
+        }
+      } catch (e) {
+        // Fallback remains visible
+      }
+    }
+
+    // Search bar event listener
+    let searchTimeout;
+    searchBar.addEventListener('input', (e) => {
+      clearTimeout(searchTimeout);
+      const query = e.target.value.trim();
+      searchTimeout = setTimeout(async () => {
+        if (!query) {
+          renderSongs(allSongs);
+          return;
+        }
+        songsGrid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--text-muted);">Searching...</div>`;
+        try {
+          const res = await fetch(`/api/search?q=${encodeURIComponent(query)}`);
+          if (res.ok) {
+            const results = await res.json();
+            renderSongs(results);
+          }
+        } catch (err) {
+          // Ignore
+        }
+      }, 300);
+    });
+
+    function showToast(msg) {
+      toastMsg.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(() => {
+        toast.classList.remove('show');
+      }, 3000);
+    }
+
+    // Load initial songs
+    loadFeaturedSongs();
+  </script>
+</body>
+</html>
