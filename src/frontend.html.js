@@ -6,22 +6,25 @@ export default `<!DOCTYPE html>
   <title>Muzo Fallback API Playground</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg-main: #0a0a0c;
-      --bg-card: #121215;
-      --bg-inner: #18181c;
-      --bg-code: #070709;
-      --accent: #2563eb;
-      --accent-dim: rgba(37, 99, 235, 0.1);
-      --accent-glow: rgba(37, 99, 235, 0.05);
-      --text-primary: #f4f4f5;
-      --text-secondary: #a1a1aa;
-      --text-muted: #52525b;
-      --border: 1px solid rgba(255, 255, 255, 0.06);
-      --border-focus: 1px solid rgba(255, 255, 255, 0.15);
-      --font-mono: 'Fira Code', monospace;
+      /* ── NAJM Editorial Palette ─────────────────── */
+      --color-paper: oklch(96.5% 0.012 75);
+      --color-paper-soft: oklch(99% 0.006 75);
+      --color-paper-warm: oklch(93% 0.020 70);
+      --color-ink: oklch(20% 0.022 55);
+      --color-ink-soft: oklch(38% 0.018 55);
+      --color-ink-mute: oklch(56% 0.012 60);
+      --color-rule: oklch(86% 0.014 70);
+      
+      --color-accent: oklch(58% 0.18 35); /* Terracotta */
+      --color-accent-dim: oklch(58% 0.18 35 / 0.1);
+      --color-saffron: oklch(78% 0.16 78);
+      
+      --font-display: "Bricolage Grotesque", -apple-system, sans-serif;
+      --font-body: "Inter", -apple-system, sans-serif;
+      --font-mono: "JetBrains Mono", monospace;
     }
 
     * {
@@ -31,9 +34,9 @@ export default `<!DOCTYPE html>
     }
 
     body {
-      background-color: var(--bg-main);
-      color: var(--text-primary);
-      font-family: 'Inter', sans-serif;
+      background-color: var(--color-paper);
+      color: var(--color-ink);
+      font-family: var(--font-body);
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -41,10 +44,21 @@ export default `<!DOCTYPE html>
       -webkit-font-smoothing: antialiased;
     }
 
+    /* Zellige overlay background */
+    .zellige-bg {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      opacity: 0.02;
+      background-image: conic-gradient(from 45deg at 50% 50%, transparent 0deg, currentColor 45deg, transparent 90deg, currentColor 135deg, transparent 180deg, currentColor 225deg, transparent 270deg, currentColor 315deg, transparent 360deg);
+      background-size: 60px 60px;
+      pointer-events: none;
+    }
+
     header {
-      border-bottom: var(--border);
-      background-color: var(--bg-card);
-      padding: 1.25rem 2rem;
+      border-bottom: 1px solid var(--color-rule);
+      background-color: var(--color-paper-soft);
+      padding: 1.5rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -53,25 +67,32 @@ export default `<!DOCTYPE html>
     }
 
     .brand-section h1 {
-      font-size: 1.25rem;
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--color-ink);
+      letter-spacing: -0.03em;
+    }
+
+    .brand-section h1 em {
+      font-style: italic;
+      color: var(--color-accent);
       font-weight: 600;
-      color: var(--text-primary);
-      letter-spacing: -0.02em;
     }
 
     .brand-section p {
-      color: var(--text-secondary);
+      color: var(--color-ink-soft);
       font-size: 0.8rem;
       margin-top: 0.15rem;
     }
 
     .base-url-badge {
       font-family: var(--font-mono);
-      background: var(--bg-inner);
-      border: var(--border);
-      color: var(--text-primary);
+      background: var(--color-paper-warm);
+      border: 1px solid var(--color-rule);
+      color: var(--color-ink-soft);
       padding: 0.35rem 0.75rem;
-      border-radius: 6px;
+      border-radius: 99px;
       font-size: 0.8rem;
       font-weight: 500;
     }
@@ -93,8 +114,8 @@ export default `<!DOCTYPE html>
 
     /* Sidebar - API Documentation */
     .sidebar {
-      border-right: var(--border);
-      background: var(--bg-card);
+      border-right: 1px solid var(--color-rule);
+      background: var(--color-paper-soft);
       padding: 2rem;
       display: flex;
       flex-direction: column;
@@ -103,27 +124,29 @@ export default `<!DOCTYPE html>
     }
 
     .sidebar h2 {
-      font-size: 0.85rem;
-      font-weight: 600;
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--text-secondary);
+      color: var(--color-ink-soft);
       margin-bottom: 1rem;
+      border-bottom: 1px solid var(--color-rule);
       padding-bottom: 0.5rem;
     }
 
     .api-endpoint-card {
-      background: rgba(255, 255, 255, 0.02);
-      border: var(--border);
-      border-radius: 6px;
+      background: var(--color-paper);
+      border: 1px solid var(--color-rule);
+      border-radius: 8px;
       padding: 1rem;
       margin-bottom: 1rem;
       transition: all 0.2s ease;
     }
 
     .api-endpoint-card:hover {
-      border-color: rgba(255, 255, 255, 0.12);
-      background: rgba(255, 255, 255, 0.03);
+      border-color: var(--color-ink-mute);
+      background: var(--color-paper-warm);
     }
 
     .endpoint-badge {
@@ -138,34 +161,34 @@ export default `<!DOCTYPE html>
     }
 
     .badge-get {
-      background: var(--accent-dim);
-      color: var(--accent);
-      border: 1px solid rgba(37, 99, 235, 0.2);
+      background: var(--color-accent-dim);
+      color: var(--color-accent);
+      border: 1px solid var(--color-accent-dim);
     }
 
     .endpoint-path {
       font-family: var(--font-mono);
       font-size: 0.8rem;
       font-weight: 500;
-      color: var(--text-primary);
+      color: var(--color-ink);
       word-break: break-all;
     }
 
     .endpoint-desc {
       font-size: 0.75rem;
-      color: var(--text-secondary);
+      color: var(--color-ink-soft);
       margin-top: 0.4rem;
       line-height: 1.4;
     }
 
     .code-snippet {
-      background: var(--bg-code);
-      border: var(--border);
+      background: var(--color-paper-warm);
+      border: 1px solid var(--color-rule);
       border-radius: 4px;
       padding: 0.5rem;
       font-family: var(--font-mono);
       font-size: 0.7rem;
-      color: var(--text-secondary);
+      color: var(--color-ink-soft);
       margin-top: 0.75rem;
       position: relative;
       overflow-x: auto;
@@ -189,40 +212,47 @@ export default `<!DOCTYPE html>
     .search-input {
       width: 100%;
       padding: 0.85rem 1rem 0.85rem 2.75rem;
-      background: var(--bg-card);
-      border: var(--border);
-      border-radius: 6px;
-      color: var(--text-primary);
+      background: var(--color-paper-soft);
+      border: 1px solid var(--color-rule);
+      border-radius: 99px;
+      color: var(--color-ink);
       font-size: 0.95rem;
       outline: none;
       transition: all 0.2s;
     }
 
     .search-input:focus {
-      border-color: rgba(255, 255, 255, 0.2);
-      background: var(--bg-inner);
+      border-color: var(--color-ink);
+      background: var(--color-paper-soft);
     }
 
     .search-icon {
       position: absolute;
-      left: 0.85rem;
+      left: 1rem;
       top: 50%;
       transform: translateY(-50%);
-      color: var(--text-secondary);
+      color: var(--color-ink-soft);
       width: 16px;
       height: 16px;
     }
 
     /* Song Grid */
     .section-title {
-      font-size: 0.8rem;
-      font-weight: 600;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 800;
       text-transform: uppercase;
       letter-spacing: 0.05em;
-      color: var(--text-secondary);
+      color: var(--color-ink-soft);
       margin-bottom: 1rem;
-      border-left: 2px solid var(--accent);
-      padding-left: 0.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .section-title::before {
+      content: "★";
+      color: var(--color-accent);
     }
 
     .songs-grid {
@@ -232,9 +262,9 @@ export default `<!DOCTYPE html>
     }
 
     .song-card {
-      background: var(--bg-card);
-      border: var(--border);
-      border-radius: 6px;
+      background: var(--color-paper-soft);
+      border: 1px solid var(--color-rule);
+      border-radius: 8px;
       padding: 1.2rem;
       cursor: pointer;
       transition: all 0.2s;
@@ -245,15 +275,15 @@ export default `<!DOCTYPE html>
     }
 
     .song-card:hover {
-      border-color: rgba(255, 255, 255, 0.15);
-      background: var(--bg-inner);
-      transform: translateY(-1px);
+      border-color: var(--color-ink);
+      transform: translateY(-2px);
     }
 
     .song-title-text {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--text-primary);
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 800;
+      color: var(--color-ink);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -261,7 +291,7 @@ export default `<!DOCTYPE html>
 
     .song-artist {
       font-size: 0.8rem;
-      color: var(--text-secondary);
+      color: var(--color-ink-soft);
       margin-top: 0.15rem;
       white-space: nowrap;
       overflow: hidden;
@@ -276,22 +306,22 @@ export default `<!DOCTYPE html>
 
     .meta-tag {
       font-size: 0.65rem;
-      font-weight: 500;
+      font-weight: 600;
       padding: 0.15rem 0.35rem;
-      border-radius: 4px;
+      border-radius: 99px;
       text-transform: uppercase;
     }
 
     .tag-lyrics {
-      background: rgba(255, 255, 255, 0.05);
-      color: var(--text-primary);
-      border: var(--border);
+      background: var(--color-paper-warm);
+      color: var(--color-ink-soft);
+      border: 1px solid var(--color-rule);
     }
 
     .tag-canvas {
-      background: var(--accent-dim);
-      color: var(--accent);
-      border: 1px solid rgba(37, 99, 235, 0.15);
+      background: var(--color-accent-dim);
+      color: var(--color-accent);
+      border: 1px solid var(--color-accent-dim);
     }
 
     /* Explorer Panel Grid */
@@ -299,9 +329,9 @@ export default `<!DOCTYPE html>
       display: grid;
       grid-template-columns: 1fr;
       gap: 2rem;
-      background: var(--bg-card);
-      border: var(--border);
-      border-radius: 8px;
+      background: var(--color-paper-soft);
+      border: 1px solid var(--color-rule);
+      border-radius: 10px;
       padding: 2rem;
       position: relative;
     }
@@ -319,19 +349,20 @@ export default `<!DOCTYPE html>
     }
 
     .lyrics-header {
-      border-bottom: var(--border);
+      border-bottom: 1px solid var(--color-rule);
       padding-bottom: 1rem;
       margin-bottom: 1.5rem;
     }
 
     .lyrics-header h2 {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--text-primary);
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--color-ink);
     }
 
     .lyrics-header p {
-      color: var(--text-secondary);
+      color: var(--color-ink-soft);
       font-size: 0.85rem;
       margin-top: 0.2rem;
     }
@@ -340,7 +371,7 @@ export default `<!DOCTYPE html>
       flex: 1;
       font-size: 0.95rem;
       line-height: 1.7;
-      color: var(--text-primary);
+      color: var(--color-ink);
       overflow-y: auto;
       max-height: 400px;
       white-space: pre-wrap;
@@ -357,10 +388,10 @@ export default `<!DOCTYPE html>
     .canvas-wrapper {
       width: 100%;
       aspect-ratio: 9 / 16;
-      border-radius: 6px;
+      border-radius: 8px;
       overflow: hidden;
       background: #000;
-      border: var(--border);
+      border: 1px solid var(--color-rule);
       position: relative;
       max-width: 220px;
     }
@@ -378,10 +409,10 @@ export default `<!DOCTYPE html>
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      color: var(--text-secondary);
+      color: var(--color-ink-soft);
       text-align: center;
       padding: 1.5rem;
-      background: var(--bg-inner);
+      background: var(--color-paper-warm);
       font-size: 0.8rem;
     }
 
@@ -395,7 +426,7 @@ export default `<!DOCTYPE html>
     /* Sandbox Console/Log */
     .sandbox-console {
       grid-column: 1 / -1;
-      border-top: var(--border);
+      border-top: 1px solid var(--color-rule);
       padding-top: 1.5rem;
       margin-top: 1rem;
     }
@@ -408,22 +439,23 @@ export default `<!DOCTYPE html>
     }
 
     .console-title {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--text-secondary);
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--color-ink-soft);
       display: flex;
       align-items: center;
       gap: 0.4rem;
     }
 
     .console-output {
-      background: var(--bg-code);
-      border: var(--border);
-      border-radius: 6px;
+      background: var(--color-paper-warm);
+      border: 1px solid var(--color-rule);
+      border-radius: 8px;
       padding: 1rem;
       font-family: var(--font-mono);
       font-size: 0.75rem;
-      color: var(--text-primary);
+      color: var(--color-ink);
       max-height: 180px;
       overflow-y: auto;
       white-space: pre-wrap;
@@ -432,9 +464,9 @@ export default `<!DOCTYPE html>
     .no-selection {
       text-align: center;
       padding: 5rem 2rem;
-      color: var(--text-secondary);
-      border: 1px dashed rgba(255,255,255,0.1);
-      border-radius: 8px;
+      color: var(--color-ink-soft);
+      border: 1px dashed var(--color-ink-mute);
+      border-radius: 10px;
       font-size: 0.9rem;
     }
 
@@ -444,7 +476,7 @@ export default `<!DOCTYPE html>
 
     /* Shimmer Loader */
     .shimmer {
-      background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-inner) 50%, var(--bg-card) 75%);
+      background: linear-gradient(90deg, var(--color-paper-soft) 25%, var(--color-paper-warm) 50%, var(--color-paper-soft) 75%);
       background-size: 200% 100%;
       animation: loading 1.5s infinite linear;
     }
@@ -459,12 +491,12 @@ export default `<!DOCTYPE html>
       position: fixed;
       bottom: 2rem;
       right: 2rem;
-      background: var(--bg-card);
-      border: var(--border);
-      color: var(--text-primary);
+      background: var(--color-paper-soft);
+      border: 1px solid var(--color-ink);
+      color: var(--color-ink);
       padding: 0.85rem 1.25rem;
-      border-radius: 6px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      border-radius: 99px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
       z-index: 10000;
       transform: translateY(150%);
       transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
@@ -480,19 +512,20 @@ export default `<!DOCTYPE html>
   </style>
 </head>
 <body>
+  <div class="zellige-bg"></div>
 
   <header>
     <div class="brand-section">
-      <h1>Muzo Fallback API Playground</h1>
+      <h1>MUZO <em>Fallback</em> Playground</h1>
       <p>Local fallback caching layer for synced lyrics and canvas loops.</p>
     </div>
     <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
       <div style="display: flex; gap: 0.5rem; font-size: 0.8rem;">
-        <div style="border: var(--border); padding: 0.35rem 0.75rem; border-radius: 6px; background: var(--bg-card); display: flex; align-items: center; gap: 0.35rem; color: var(--text-secondary);">
-          Lyrics: <span id="stats-lyrics" style="color: var(--text-primary); font-weight: 600;">...</span>
+        <div style="border: 1px solid var(--color-rule); padding: 0.35rem 0.75rem; border-radius: 99px; background: var(--color-paper-soft); display: flex; align-items: center; gap: 0.35rem; color: var(--color-ink-soft);">
+          Lyrics: <span id="stats-lyrics" style="color: var(--color-ink); font-weight: 600;">...</span>
         </div>
-        <div style="border: var(--border); padding: 0.35rem 0.75rem; border-radius: 6px; background: var(--bg-card); display: flex; align-items: center; gap: 0.35rem; color: var(--text-secondary);">
-          Canvas: <span id="stats-canvas" style="color: var(--text-primary); font-weight: 600;">...</span>
+        <div style="border: 1px solid var(--color-rule); padding: 0.35rem 0.75rem; border-radius: 99px; background: var(--color-paper-soft); display: flex; align-items: center; gap: 0.35rem; color: var(--color-ink-soft);">
+          Canvas: <span id="stats-canvas" style="color: var(--color-ink); font-weight: 600;">...</span>
         </div>
       </div>
       <div class="base-url-badge">BASE: https://mlc.kouzu.in</div>
@@ -646,8 +679,8 @@ export default `<!DOCTYPE html>
     async function loadFeaturedSongs() {
       songsGrid.innerHTML = Array(4).fill(0).map(() => \`
         <div class="song-card shimmer">
-          <div style="height: 0.95rem; width: 60%; background: rgba(255,255,255,0.03); margin-bottom: 0.5rem; border-radius: 4px;"></div>
-          <div style="height: 0.8rem; width: 40%; background: rgba(255,255,255,0.03); border-radius: 4px;"></div>
+          <div style="height: 0.95rem; width: 60%; background: rgba(0,0,0,0.05); margin-bottom: 0.5rem; border-radius: 4px;"></div>
+          <div style="height: 0.8rem; width: 40%; background: rgba(0,0,0,0.05); border-radius: 4px;"></div>
         </div>
       \`).join('');
 
@@ -657,16 +690,16 @@ export default `<!DOCTYPE html>
           allSongs = await res.json();
           renderSongs(allSongs);
         } else {
-          songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">Failed to load cached songs.</p>';
+          songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--color-ink-soft);">Failed to load cached songs.</p>';
         }
       } catch (err) {
-        songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">Error connecting to fallback worker.</p>';
+        songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--color-ink-soft);">Error connecting to fallback worker.</p>';
       }
     }
 
     function renderSongs(songs) {
       if (songs.length === 0) {
-        songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">No songs found in database.</p>';
+        songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--color-ink-soft);">No songs found in database.</p>';
         return;
       }
 
@@ -696,7 +729,7 @@ export default `<!DOCTYPE html>
       detailContainer.classList.remove('hidden');
       detailTitle.textContent = name;
       detailArtist.textContent = artist;
-      lyricsBody.innerHTML = \`<span style="color: var(--text-secondary)">Fetching lyrics...</span>\`;
+      lyricsBody.innerHTML = \`<span style="color: var(--color-ink-soft)">Fetching lyrics...</span>\`;
       canvasVideo.classList.add('hidden');
       canvasFallback.classList.remove('hidden');
       consoleOutput.textContent = "Initializing request...";
@@ -712,12 +745,12 @@ export default `<!DOCTYPE html>
           showToast("Lyrics fetched!");
           logConsole(\`https://mlc.kouzu.in\${targetUrl}\`, 'GET', lyricsRes.status, data);
         } else {
-          lyricsBody.innerHTML = \`<span style="color: #ef4444">Failed to read file. Status \${lyricsRes.status}</span>\`;
+          lyricsBody.innerHTML = \`<span style="color: var(--color-accent)">Failed to read file. Status \${lyricsRes.status}</span>\`;
           const errorData = await lyricsRes.json().catch(() => ({}));
           logConsole(\`https://mlc.kouzu.in\${targetUrl}\`, 'GET', lyricsRes.status, errorData);
         }
       } catch (e) {
-        lyricsBody.innerHTML = \`<span style="color: #ef4444">Error loading lyrics.</span>\`;
+        lyricsBody.innerHTML = \`<span style="color: var(--color-accent)">Error loading lyrics.</span>\`;
       }
 
       // Fetch canvas
@@ -747,7 +780,7 @@ export default `<!DOCTYPE html>
           renderSongs(allSongs);
           return;
         }
-        songsGrid.innerHTML = \`<div style="grid-column: 1/-1; text-align: center; color: var(--text-secondary);">Searching fallback db...</div>\`;
+        songsGrid.innerHTML = \`<div style="grid-column: 1/-1; text-align: center; color: var(--color-ink-soft);">Searching fallback db...</div>\`;
         try {
           const res = await fetch(\`/api/search?q=\${encodeURIComponent(query)}\`);
           if (res.ok) {
