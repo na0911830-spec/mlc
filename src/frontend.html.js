@@ -3,39 +3,53 @@ export default `<!DOCTYPE html>
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Muzo Fallback API Playground</title>
+  <title>MLC Playground</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Space+Mono:wght@400;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      /* ── NAJM Editorial Palette ─────────────────── */
-      --color-paper: oklch(96.5% 0.012 75);
-      --color-paper-soft: oklch(99% 0.006 75);
-      --color-paper-warm: oklch(93% 0.020 70);
-      --color-ink: oklch(20% 0.022 55);
-      --color-ink-soft: oklch(38% 0.018 55);
-      --color-ink-mute: oklch(56% 0.012 60);
-      --color-rule: oklch(86% 0.014 70);
-      
-      --color-accent: oklch(58% 0.18 35); /* Terracotta */
-      --color-accent-dim: oklch(58% 0.18 35 / 0.1);
-      --color-saffron: oklch(78% 0.16 78);
-      
-      --font-display: "Bricolage Grotesque", -apple-system, sans-serif;
-      --font-body: "Inter", -apple-system, sans-serif;
-      --font-mono: "JetBrains Mono", monospace;
+      /* ── Jukebox Console Palette ─────────────────── */
+      --bg: #14100c;
+      --bg-raised: #1c1610;
+      --metal: #2b241d;
+      --metal-light: #3c3227;
+      --glass: #1c1712;
+      --glass-deep: #110d0a;
+
+      --cream: #f4e9d2;
+      --cream-dim: #c9b78f;
+      --ink: #241c14;
+
+      --amber: #ffb733;
+      --amber-soft: rgba(255, 183, 51, 0.14);
+      --amber-glow: rgba(255, 183, 51, 0.55);
+
+      --cyan: #63e6ea;
+      --cyan-soft: rgba(99, 230, 234, 0.14);
+      --cyan-glow: rgba(99, 230, 234, 0.55);
+
+      --red: #c1483c;
+      --red-soft: rgba(193, 72, 60, 0.16);
+
+      --rule: rgba(244, 233, 210, 0.10);
+      --rule-strong: rgba(244, 233, 210, 0.20);
+
+      --font-display: "Bungee", system-ui, sans-serif;
+      --font-body: "Manrope", -apple-system, sans-serif;
+      --font-mono: "Space Mono", monospace;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scrollbar-color: var(--metal-light) var(--bg-raised); }
 
     body {
-      background-color: var(--color-paper);
-      color: var(--color-ink);
+      background-color: var(--bg);
+      background-image:
+        radial-gradient(ellipse 900px 500px at 15% -10%, rgba(255,183,51,0.06), transparent 60%),
+        radial-gradient(ellipse 900px 500px at 90% 0%, rgba(99,230,234,0.05), transparent 60%);
+      color: var(--cream);
       font-family: var(--font-body);
       min-height: 100vh;
       display: flex;
@@ -44,21 +58,24 @@ export default `<!DOCTYPE html>
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Zellige overlay background */
-    .zellige-bg {
+    ::selection { background: var(--amber-soft); color: var(--amber); }
+
+    /* Brushed metal texture overlay */
+    .metal-bg {
       position: fixed;
       inset: 0;
       z-index: -1;
-      opacity: 0.02;
-      background-image: conic-gradient(from 45deg at 50% 50%, transparent 0deg, currentColor 45deg, transparent 90deg, currentColor 135deg, transparent 180deg, currentColor 225deg, transparent 270deg, currentColor 315deg, transparent 360deg);
-      background-size: 60px 60px;
+      opacity: 0.5;
+      background-image: repeating-linear-gradient(180deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 3px);
       pointer-events: none;
     }
 
     header {
-      border-bottom: 1px solid var(--color-rule);
-      background-color: var(--color-paper-soft);
-      padding: 1.5rem 2rem;
+      border-bottom: 2px solid var(--rule-strong);
+      background:
+        repeating-linear-gradient(100deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 5px),
+        var(--metal);
+      padding: 1.35rem 2rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -66,35 +83,107 @@ export default `<!DOCTYPE html>
       gap: 1rem;
     }
 
-    .brand-section h1 {
+    .marquee {
+      background: var(--glass-deep);
+      border: 3px solid var(--metal-light);
+      border-radius: 10px;
+      padding: 0.6rem 1.4rem;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.6), inset 0 0 30px rgba(255,183,51,0.05);
+      animation: flicker-in 1.4s ease-out;
+    }
+
+    @keyframes flicker-in {
+      0% { opacity: 0; }
+      8% { opacity: 1; }
+      12% { opacity: 0.2; }
+      20% { opacity: 1; }
+      26% { opacity: 0.4; }
+      34% { opacity: 1; }
+      100% { opacity: 1; }
+    }
+
+    .marquee h1 {
       font-family: var(--font-display);
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--color-ink);
-      letter-spacing: -0.03em;
+      font-size: 1.4rem;
+      letter-spacing: 0.02em;
+      color: var(--amber);
+      text-shadow: 0 0 4px var(--amber-glow), 0 0 16px rgba(255,183,51,0.35);
+      display: inline;
     }
 
-    .brand-section h1 em {
-      font-style: italic;
-      color: var(--color-accent);
-      font-weight: 600;
+    .marquee h1 .sep {
+      color: var(--cream-dim);
+      font-size: 1rem;
+      margin: 0 0.35rem;
+      text-shadow: none;
     }
 
-    .brand-section p {
-      color: var(--color-ink-soft);
-      font-size: 0.8rem;
-      margin-top: 0.15rem;
+    .marquee h1 em {
+      font-style: normal;
+      color: var(--cyan);
+      text-shadow: 0 0 4px var(--cyan-glow), 0 0 16px rgba(99,230,234,0.35);
     }
 
-    .base-url-badge {
+    .marquee p {
+      color: var(--cream-dim);
       font-family: var(--font-mono);
-      background: var(--color-paper-warm);
-      border: 1px solid var(--color-rule);
-      color: var(--color-ink-soft);
-      padding: 0.35rem 0.75rem;
+      font-size: 0.68rem;
+      letter-spacing: 0.04em;
+      margin-top: 0.3rem;
+      text-transform: uppercase;
+    }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .vu-pill {
+      border: 1px solid var(--rule-strong);
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      background: var(--glass);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--cream-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      box-shadow: inset 0 1px 4px rgba(0,0,0,0.5);
+    }
+
+    .vu-pill .led {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 6px var(--amber-glow), 0 0 2px var(--amber);
+      flex-shrink: 0;
+    }
+
+    .vu-pill.cyan-led .led {
+      background: var(--cyan);
+      box-shadow: 0 0 6px var(--cyan-glow), 0 0 2px var(--cyan);
+    }
+
+    .vu-pill strong {
+      color: var(--cream);
+      font-weight: 700;
+      font-size: 0.85rem;
+    }
+
+    .chrome-badge {
+      font-family: var(--font-mono);
+      background: linear-gradient(180deg, var(--metal-light), var(--metal));
+      border: 1px solid var(--rule-strong);
+      color: var(--cream-dim);
+      padding: 0.45rem 0.9rem;
       border-radius: 99px;
-      font-size: 0.8rem;
+      font-size: 0.72rem;
       font-weight: 500;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 1px 3px rgba(0,0,0,0.4);
     }
 
     .app-layout {
@@ -107,123 +196,136 @@ export default `<!DOCTYPE html>
     }
 
     @media (min-width: 1024px) {
-      .app-layout {
-        grid-template-columns: 340px 1fr;
-      }
+      .app-layout { grid-template-columns: 350px 1fr; }
     }
 
-    /* Sidebar - API Documentation */
+    /* Sidebar — Selector Panel */
     .sidebar {
-      border-right: 1px solid var(--color-rule);
-      background: var(--color-paper-soft);
-      padding: 2rem;
+      border-right: 2px solid var(--rule);
+      background: var(--bg-raised);
+      padding: 2rem 1.6rem;
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
       overflow-y: auto;
     }
 
-    .sidebar h2 {
+    .panel-label {
       font-family: var(--font-display);
-      font-size: 0.9rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--color-ink-soft);
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      color: var(--amber);
       margin-bottom: 1rem;
-      border-bottom: 1px solid var(--color-rule);
-      padding-bottom: 0.5rem;
+      padding-bottom: 0.6rem;
+      border-bottom: 2px solid var(--red);
+      display: inline-block;
     }
 
-    .api-endpoint-card {
-      background: var(--color-paper);
-      border: 1px solid var(--color-rule);
+    .endpoint-card {
+      background: var(--metal);
+      border: 1px solid var(--rule);
       border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
-      transition: all 0.2s ease;
+      padding: 0.9rem;
+      margin-bottom: 0.9rem;
+      display: flex;
+      gap: 0.75rem;
+      transition: border-color 0.2s ease, transform 0.15s ease;
     }
 
-    .api-endpoint-card:hover {
-      border-color: var(--color-ink-mute);
-      background: var(--color-paper-warm);
+    .endpoint-card:hover {
+      border-color: var(--amber);
+      transform: translateX(2px);
+    }
+
+    .endpoint-code {
+      flex-shrink: 0;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: var(--glass-deep);
+      border: 2px solid var(--red);
+      color: var(--cream);
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 0.72rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .endpoint-badge {
       display: inline-block;
       font-family: var(--font-mono);
-      font-size: 0.7rem;
-      font-weight: 600;
-      padding: 0.15rem 0.4rem;
-      border-radius: 4px;
+      font-size: 0.62rem;
+      font-weight: 700;
+      padding: 0.1rem 0.4rem;
+      border-radius: 3px;
       text-transform: uppercase;
-      margin-bottom: 0.5rem;
-    }
-
-    .badge-get {
-      background: var(--color-accent-dim);
-      color: var(--color-accent);
-      border: 1px solid var(--color-accent-dim);
+      background: var(--amber-soft);
+      color: var(--amber);
+      border: 1px solid rgba(255,183,51,0.3);
+      margin-bottom: 0.4rem;
     }
 
     .endpoint-path {
       font-family: var(--font-mono);
-      font-size: 0.8rem;
-      font-weight: 500;
-      color: var(--color-ink);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--cream);
       word-break: break-all;
     }
 
     .endpoint-desc {
-      font-size: 0.75rem;
-      color: var(--color-ink-soft);
+      font-size: 0.73rem;
+      color: var(--cream-dim);
       margin-top: 0.4rem;
-      line-height: 1.4;
+      line-height: 1.45;
     }
 
     .code-snippet {
-      background: var(--color-paper-warm);
-      border: 1px solid var(--color-rule);
-      border-radius: 4px;
-      padding: 0.5rem;
+      background: var(--glass-deep);
+      border-top: 1px dashed var(--rule-strong);
+      border-radius: 0 0 4px 4px;
+      padding: 0.5rem 0;
+      margin-top: 0.6rem;
       font-family: var(--font-mono);
-      font-size: 0.7rem;
-      color: var(--color-ink-soft);
-      margin-top: 0.75rem;
-      position: relative;
+      font-size: 0.66rem;
+      color: var(--cyan);
       overflow-x: auto;
+      white-space: pre;
     }
 
-    /* Main Content Area */
+    /* Main workspace */
     .main-content {
-      padding: 2.5rem;
+      padding: 2.25rem 2.5rem 3rem;
       display: flex;
       flex-direction: column;
       gap: 2.5rem;
       overflow-y: auto;
     }
 
-    /* Search Section */
-    .search-wrapper {
-      position: relative;
-      width: 100%;
-    }
+    /* Search — coin slot */
+    .search-wrapper { position: relative; width: 100%; }
 
     .search-input {
       width: 100%;
-      padding: 0.85rem 1rem 0.85rem 2.75rem;
-      background: var(--color-paper-soft);
-      border: 1px solid var(--color-rule);
-      border-radius: 99px;
-      color: var(--color-ink);
-      font-size: 0.95rem;
+      padding: 0.9rem 1rem 0.9rem 2.85rem;
+      background: var(--glass-deep);
+      border: 2px solid var(--metal-light);
+      border-radius: 8px;
+      color: var(--cream);
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
       outline: none;
-      transition: all 0.2s;
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.55);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
+    .search-input::placeholder { color: var(--cream-dim); opacity: 0.6; }
+
     .search-input:focus {
-      border-color: var(--color-ink);
-      background: var(--color-paper-soft);
+      border-color: var(--amber);
+      box-shadow: inset 0 2px 8px rgba(0,0,0,0.55), 0 0 0 3px var(--amber-soft);
     }
 
     .search-icon {
@@ -231,176 +333,198 @@ export default `<!DOCTYPE html>
       left: 1rem;
       top: 50%;
       transform: translateY(-50%);
-      color: var(--color-ink-soft);
+      color: var(--cyan);
       width: 16px;
       height: 16px;
     }
 
-    /* Song Grid */
+    /* Section titles with LED marker */
     .section-title {
       font-family: var(--font-display);
       font-size: 0.85rem;
-      font-weight: 800;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--color-ink-soft);
+      letter-spacing: 0.04em;
+      color: var(--cream);
       margin-bottom: 1rem;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.6rem;
     }
 
     .section-title::before {
-      content: "★";
-      color: var(--color-accent);
+      content: "";
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--cyan);
+      box-shadow: 0 0 6px var(--cyan-glow);
+      animation: pulse-led 2.2s ease-in-out infinite;
     }
 
+    @keyframes pulse-led {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.35; }
+    }
+
+    /* Song grid — title strip cards */
     .songs-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1rem;
+      grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+      gap: 1.1rem;
     }
 
     .song-card {
-      background: var(--color-paper-soft);
-      border: 1px solid var(--color-rule);
-      border-radius: 8px;
-      padding: 1.2rem;
+      position: relative;
+      background: var(--cream);
+      border-bottom: 5px solid var(--red);
+      border-radius: 3px;
+      padding: 1.1rem 1.2rem;
       cursor: pointer;
-      transition: all 0.2s;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      min-height: 110px;
+      min-height: 108px;
+      box-shadow: 0 3px 0 rgba(0,0,0,0.3), 0 6px 14px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+
+    .song-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,0.35) 48%, transparent 56%);
+      opacity: 0;
+      transition: opacity 0.2s ease;
+      pointer-events: none;
     }
 
     .song-card:hover {
-      border-color: var(--color-ink);
-      transform: translateY(-2px);
+      transform: translateY(-3px) rotate(-0.6deg);
+      box-shadow: 0 5px 0 rgba(0,0,0,0.3), 0 12px 22px rgba(0,0,0,0.4);
     }
+
+    .song-card:hover::after { opacity: 1; }
 
     .song-title-text {
       font-family: var(--font-display);
-      font-size: 1.05rem;
-      font-weight: 800;
-      color: var(--color-ink);
+      font-size: 0.92rem;
+      letter-spacing: 0.01em;
+      color: var(--ink);
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      line-height: 1.3;
     }
 
     .song-artist {
-      font-size: 0.8rem;
-      color: var(--color-ink-soft);
-      margin-top: 0.15rem;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--ink);
+      opacity: 0.62;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+      margin-top: 0.3rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .song-meta-tags {
-      display: flex;
-      gap: 0.4rem;
-      margin-top: 0.75rem;
-    }
+    .song-meta-tags { display: flex; gap: 0.4rem; margin-top: 0.85rem; }
 
     .meta-tag {
-      font-size: 0.65rem;
-      font-weight: 600;
-      padding: 0.15rem 0.35rem;
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 0.18rem 0.45rem;
       border-radius: 99px;
       text-transform: uppercase;
+      letter-spacing: 0.03em;
     }
 
-    .tag-lyrics {
-      background: var(--color-paper-warm);
-      color: var(--color-ink-soft);
-      border: 1px solid var(--color-rule);
-    }
+    .tag-lyrics { background: var(--ink); color: var(--cream); }
+    .tag-canvas { background: var(--red); color: var(--cream); }
 
-    .tag-canvas {
-      background: var(--color-accent-dim);
-      color: var(--color-accent);
-      border: 1px solid var(--color-accent-dim);
-    }
-
-    /* Explorer Panel Grid */
+    /* Sandbox / service panel */
     .detail-container {
       display: grid;
       grid-template-columns: 1fr;
-      gap: 2rem;
-      background: var(--color-paper-soft);
-      border: 1px solid var(--color-rule);
-      border-radius: 10px;
-      padding: 2rem;
+      gap: 1.75rem;
+      background: var(--bg-raised);
+      border: 2px solid var(--metal-light);
+      border-radius: 14px;
+      padding: 1.75rem;
       position: relative;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.03);
     }
 
     @media (min-width: 1200px) {
-      .detail-container {
-        grid-template-columns: 1fr 280px;
-      }
+      .detail-container { grid-template-columns: 1fr 260px; }
     }
 
-    .lyrics-panel {
-      display: flex;
-      flex-direction: column;
-      min-height: 380px;
-    }
+    .lyrics-panel { display: flex; flex-direction: column; min-height: 380px; }
 
     .lyrics-header {
-      border-bottom: 1px solid var(--color-rule);
-      padding-bottom: 1rem;
-      margin-bottom: 1.5rem;
+      border-bottom: 1px solid var(--rule-strong);
+      padding-bottom: 0.9rem;
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: baseline;
+      gap: 0.6rem;
+    }
+
+    .lyrics-header .led {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--amber);
+      box-shadow: 0 0 6px var(--amber-glow);
+      flex-shrink: 0;
     }
 
     .lyrics-header h2 {
       font-family: var(--font-display);
-      font-size: 1.35rem;
-      font-weight: 800;
-      color: var(--color-ink);
+      font-size: 1.1rem;
+      color: var(--cream);
     }
 
     .lyrics-header p {
-      color: var(--color-ink-soft);
-      font-size: 0.85rem;
-      margin-top: 0.2rem;
+      color: var(--cyan);
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      margin-top: 0.15rem;
     }
 
     .lyrics-body {
       flex: 1;
-      font-size: 0.95rem;
-      line-height: 1.7;
-      color: var(--color-ink);
+      background: var(--glass-deep);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 1.1rem 1.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.88rem;
+      line-height: 1.85;
+      color: var(--cream);
       overflow-y: auto;
       max-height: 400px;
       white-space: pre-wrap;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
     }
 
-    /* Canvas Panel */
-    .canvas-panel {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 1.5rem;
-    }
+    /* Canvas viewport bezel */
+    .canvas-panel { display: flex; flex-direction: column; align-items: center; gap: 1.5rem; }
 
     .canvas-wrapper {
       width: 100%;
       aspect-ratio: 9 / 16;
-      border-radius: 8px;
+      border-radius: 10px;
       overflow: hidden;
       background: #000;
-      border: 1px solid var(--color-rule);
+      border: 4px solid var(--metal-light);
       position: relative;
-      max-width: 220px;
+      max-width: 210px;
+      box-shadow: inset 0 0 0 2px var(--glass-deep), 0 4px 14px rgba(0,0,0,0.5);
     }
 
-    .canvas-video {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
+    .canvas-video { width: 100%; height: 100%; object-fit: cover; }
 
     .canvas-fallback {
       position: absolute;
@@ -409,26 +533,26 @@ export default `<!DOCTYPE html>
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      color: var(--color-ink-soft);
+      color: var(--cyan);
       text-align: center;
       padding: 1.5rem;
-      background: var(--color-paper-warm);
-      font-size: 0.8rem;
+      background:
+        repeating-linear-gradient(180deg, rgba(99,230,234,0.03) 0px, rgba(99,230,234,0.03) 1px, transparent 1px, transparent 3px),
+        var(--glass-deep);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
     }
 
-    .canvas-fallback svg {
-      width: 24px;
-      height: 24px;
-      margin-bottom: 0.5rem;
-      opacity: 0.4;
-    }
+    .canvas-fallback svg { width: 22px; height: 22px; margin-bottom: 0.6rem; opacity: 0.6; }
 
-    /* Sandbox Console/Log */
+    /* Console / diagnostic CRT */
     .sandbox-console {
       grid-column: 1 / -1;
-      border-top: 1px solid var(--color-rule);
+      border-top: 1px solid var(--rule-strong);
       padding-top: 1.5rem;
-      margin-top: 1rem;
+      margin-top: 0.25rem;
     }
 
     .console-header {
@@ -440,95 +564,100 @@ export default `<!DOCTYPE html>
 
     .console-title {
       font-family: var(--font-display);
-      font-size: 0.85rem;
-      font-weight: 800;
-      color: var(--color-ink-soft);
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    .console-output {
-      background: var(--color-paper-warm);
-      border: 1px solid var(--color-rule);
-      border-radius: 8px;
-      padding: 1rem;
-      font-family: var(--font-mono);
       font-size: 0.75rem;
-      color: var(--color-ink);
-      max-height: 180px;
-      overflow-y: auto;
-      white-space: pre-wrap;
-    }
-
-    .no-selection {
-      text-align: center;
-      padding: 5rem 2rem;
-      color: var(--color-ink-soft);
-      border: 1px dashed var(--color-ink-mute);
-      border-radius: 10px;
-      font-size: 0.9rem;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    /* Shimmer Loader */
-    .shimmer {
-      background: linear-gradient(90deg, var(--color-paper-soft) 25%, var(--color-paper-warm) 50%, var(--color-paper-soft) 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s infinite linear;
-    }
-
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-
-    /* Toast system */
-    .toast {
-      position: fixed;
-      bottom: 2rem;
-      right: 2rem;
-      background: var(--color-paper-soft);
-      border: 1px solid var(--color-ink);
-      color: var(--color-ink);
-      padding: 0.85rem 1.25rem;
-      border-radius: 99px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-      z-index: 10000;
-      transform: translateY(150%);
-      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      font-size: 0.85rem;
+      letter-spacing: 0.04em;
+      color: var(--cream-dim);
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    .toast.show {
-      transform: translateY(0);
+    .console-output {
+      background:
+        repeating-linear-gradient(180deg, rgba(255,183,51,0.025) 0px, rgba(255,183,51,0.025) 1px, transparent 1px, transparent 3px),
+        var(--glass-deep);
+      border: 1px solid var(--rule);
+      border-radius: 8px;
+      padding: 1rem 1.1rem;
+      font-family: var(--font-mono);
+      font-size: 0.74rem;
+      color: var(--amber);
+      text-shadow: 0 0 3px rgba(255,183,51,0.25);
+      max-height: 180px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+      box-shadow: inset 0 2px 10px rgba(0,0,0,0.5);
     }
+
+    .no-selection {
+      text-align: center;
+      padding: 4.5rem 2rem;
+      color: var(--cream-dim);
+      border: 2px dashed var(--metal-light);
+      border-radius: 12px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      background: var(--bg-raised);
+    }
+
+    .no-selection strong { display: block; font-family: var(--font-display); color: var(--amber); font-size: 1rem; margin-bottom: 0.6rem; letter-spacing: 0.02em; }
+
+    .hidden { display: none !important; }
+
+    /* Shimmer loader */
+    .shimmer {
+      background: linear-gradient(90deg, var(--cream) 25%, #e8dcc0 50%, var(--cream) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.4s infinite linear;
+    }
+
+    @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* Ticket toast */
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      background: var(--cream);
+      border-left: 4px solid var(--red);
+      color: var(--ink);
+      padding: 0.85rem 1.25rem;
+      border-radius: 4px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      z-index: 10000;
+      transform: translateY(150%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .toast.show { transform: translateY(0); }
+
+    /* Scrollbars */
+    .sidebar::-webkit-scrollbar, .lyrics-body::-webkit-scrollbar, .console-output::-webkit-scrollbar { width: 8px; }
+    .sidebar::-webkit-scrollbar-track, .lyrics-body::-webkit-scrollbar-track, .console-output::-webkit-scrollbar-track { background: transparent; }
+    .sidebar::-webkit-scrollbar-thumb, .lyrics-body::-webkit-scrollbar-thumb, .console-output::-webkit-scrollbar-thumb { background: var(--metal-light); border-radius: 4px; }
   </style>
 </head>
 <body>
-  <div class="zellige-bg"></div>
+  <div class="metal-bg"></div>
 
   <header>
-    <div class="brand-section">
-      <h1>MUZO <em>Fallback</em> Playground</h1>
-      <p>Local fallback caching layer for synced lyrics and canvas loops.</p>
+    <div class="marquee">
+      <h1>MLC<span class="sep">/</span><em>PLAYGROUND</em></h1>
+      <p>Fallback cache · synced lyrics &amp; canvas loops</p>
     </div>
-    <div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-      <div style="display: flex; gap: 0.5rem; font-size: 0.8rem;">
-        <div style="border: 1px solid var(--color-rule); padding: 0.35rem 0.75rem; border-radius: 99px; background: var(--color-paper-soft); display: flex; align-items: center; gap: 0.35rem; color: var(--color-ink-soft);">
-          Lyrics: <span id="stats-lyrics" style="color: var(--color-ink); font-weight: 600;">...</span>
-        </div>
-        <div style="border: 1px solid var(--color-rule); padding: 0.35rem 0.75rem; border-radius: 99px; background: var(--color-paper-soft); display: flex; align-items: center; gap: 0.35rem; color: var(--color-ink-soft);">
-          Canvas: <span id="stats-canvas" style="color: var(--color-ink); font-weight: 600;">...</span>
-        </div>
+    <div class="header-right">
+      <div class="vu-pill">
+        <span class="led"></span> Lyrics <strong id="stats-lyrics">···</strong>
       </div>
-      <div class="base-url-badge">BASE: https://mlc.kouzu.in</div>
+      <div class="vu-pill cyan-led">
+        <span class="led"></span> Canvas <strong id="stats-canvas">···</strong>
+      </div>
+      <div class="chrome-badge">BASE: https://mlc.kouzu.in</div>
     </div>
   </header>
 
@@ -536,45 +665,60 @@ export default `<!DOCTYPE html>
     <!-- Sidebar / API Docs -->
     <aside class="sidebar">
       <div>
-        <h2>API Documentation</h2>
+        <span class="panel-label">Selector Panel</span>
 
-        <!-- Endpoint 1 -->
-        <div class="api-endpoint-card">
-          <span class="endpoint-badge badge-get">GET</span>
-          <div class="endpoint-path">/api/lyrics/:id</div>
-          <div class="endpoint-desc">Retrieves synced and plain-text lyrics for a given YouTube video ID. Requires song metadata query parameters to fetch live if not cached.</div>
-          <div class="code-snippet">curl https://mlc.kouzu.in/api/lyrics/dQw4w9WgXcQ</div>
+        <!-- Endpoint A1 -->
+        <div class="api-endpoint-card endpoint-card">
+          <div class="endpoint-code">A1</div>
+          <div style="flex:1; min-width:0;">
+            <span class="endpoint-badge">GET</span>
+            <div class="endpoint-path">/api/lyrics/:id</div>
+            <div class="endpoint-desc">Retrieves synced and plain-text lyrics for a given YouTube video ID. Requires song metadata query parameters to fetch live if not cached.</div>
+            <div class="code-snippet">curl https://mlc.kouzu.in/api/lyrics/dQw4w9WgXcQ</div>
+          </div>
         </div>
 
-        <!-- Endpoint 2 -->
-        <div class="api-endpoint-card">
-          <span class="endpoint-badge badge-get">GET</span>
-          <div class="endpoint-path">/api/canvas</div>
-          <div class="endpoint-desc">Retrieves loop video configuration and CDN file stream URL for a given YouTube ID.</div>
-          <div class="code-snippet">curl "https://mlc.kouzu.in/api/canvas?id=dQw4w9WgXcQ"</div>
+        <!-- Endpoint A2 -->
+        <div class="api-endpoint-card endpoint-card">
+          <div class="endpoint-code">A2</div>
+          <div style="flex:1; min-width:0;">
+            <span class="endpoint-badge">GET</span>
+            <div class="endpoint-path">/api/canvas</div>
+            <div class="endpoint-desc">Retrieves loop video configuration and CDN file stream URL for a given YouTube ID.</div>
+            <div class="code-snippet">curl "https://mlc.kouzu.in/api/canvas?id=dQw4w9WgXcQ"</div>
+          </div>
         </div>
 
-        <!-- Endpoint 3 -->
-        <div class="api-endpoint-card">
-          <span class="endpoint-badge badge-get">GET</span>
-          <div class="endpoint-path">/api/canvas/stream/:id</div>
-          <div class="endpoint-desc">Redirects to the direct Hugging Face hosted CDN video file for low-overhead client streaming.</div>
+        <!-- Endpoint A3 -->
+        <div class="api-endpoint-card endpoint-card">
+          <div class="endpoint-code">A3</div>
+          <div style="flex:1; min-width:0;">
+            <span class="endpoint-badge">GET</span>
+            <div class="endpoint-path">/api/canvas/stream/:id</div>
+            <div class="endpoint-desc">Redirects to the direct Hugging Face hosted CDN video file for low-overhead client streaming.</div>
+          </div>
         </div>
 
-        <!-- Endpoint 4 -->
-        <div class="api-endpoint-card">
-          <span class="endpoint-badge badge-get">GET</span>
-          <div class="endpoint-path">/api/search</div>
-          <div class="endpoint-desc">Queries cached database entries by song title, artists, or video ID.</div>
-          <div class="code-snippet">curl "https://mlc.kouzu.in/api/search?q=Never+Gonna+Give"</div>
+        <!-- Endpoint B1 -->
+        <div class="api-endpoint-card endpoint-card">
+          <div class="endpoint-code">B1</div>
+          <div style="flex:1; min-width:0;">
+            <span class="endpoint-badge">GET</span>
+            <div class="endpoint-path">/api/search</div>
+            <div class="endpoint-desc">Queries cached database entries by song title, artists, or video ID.</div>
+            <div class="code-snippet">curl "https://mlc.kouzu.in/api/search?q=Never+Gonna+Give"</div>
+          </div>
         </div>
 
-        <!-- Endpoint 5 -->
-        <div class="api-endpoint-card">
-          <span class="endpoint-badge badge-get">GET</span>
-          <div class="endpoint-path">/api/stats</div>
-          <div class="endpoint-desc">Retrieves total cached counts of lyrics and canvas video loops.</div>
-          <div class="code-snippet">curl "https://mlc.kouzu.in/api/stats"</div>
+        <!-- Endpoint B2 -->
+        <div class="api-endpoint-card endpoint-card">
+          <div class="endpoint-code">B2</div>
+          <div style="flex:1; min-width:0;">
+            <span class="endpoint-badge">GET</span>
+            <div class="endpoint-path">/api/stats</div>
+            <div class="endpoint-desc">Retrieves total cached counts of lyrics and canvas video loops.</div>
+            <div class="code-snippet">curl "https://mlc.kouzu.in/api/stats"</div>
+          </div>
         </div>
       </div>
     </aside>
@@ -583,7 +727,7 @@ export default `<!DOCTYPE html>
     <main class="main-content">
       <!-- Search -->
       <div class="search-wrapper">
-        <input type="text" class="search-input" id="searchBar" placeholder="Search fallback cache by name, artist, or video ID...">
+        <input type="text" class="search-input" id="searchBar" placeholder="SEARCH BY NAME, ARTIST, OR VIDEO ID...">
         <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
@@ -591,7 +735,7 @@ export default `<!DOCTYPE html>
 
       <!-- Featured Grid -->
       <div>
-        <h3 class="section-title">Cached Entries</h3>
+        <h3 class="section-title">Now Stocked</h3>
         <div class="songs-grid" id="songsGrid">
           <!-- Rendered song cards -->
         </div>
@@ -599,17 +743,21 @@ export default `<!DOCTYPE html>
 
       <!-- Playback Sandbox Details -->
       <div>
-        <h3 class="section-title">Sandbox Playground</h3>
+        <h3 class="section-title">Test Deck</h3>
         <div id="noSelection" class="no-selection">
-          Select a song card above to test cache resolution and output response payload.
+          <strong>No title loaded</strong>
+          Press a title strip above to run a live cache lookup and view the response payload.
         </div>
 
         <div id="detailContainer" class="detail-container hidden">
           <!-- Lyrics Explorer -->
           <div class="lyrics-panel">
             <div class="lyrics-header">
-              <h2 id="detailTitle">Song Title</h2>
-              <p id="detailArtist">Artist Name</p>
+              <span class="led"></span>
+              <div>
+                <h2 id="detailTitle">Song Title</h2>
+                <p id="detailArtist">Artist Name</p>
+              </div>
             </div>
             <div class="lyrics-body" id="lyricsBody">
               <!-- Synced lyrics content -->
@@ -624,7 +772,7 @@ export default `<!DOCTYPE html>
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
                 </svg>
-                <p style="font-weight: 500;">No Canvas Video</p>
+                <p>No Signal — Canvas Not Cached</p>
               </div>
             </div>
           </div>
@@ -636,11 +784,11 @@ export default `<!DOCTYPE html>
                 <svg style="width:14px; height:14px;" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
-                API Console Output
+                Diagnostic Readout
               </div>
             </div>
             <div class="console-output" id="consoleOutput">
-              Ready to run request...
+              Standing by for request...
             </div>
           </div>
         </div>
@@ -672,15 +820,15 @@ export default `<!DOCTYPE html>
     let allSongs = [];
 
     function logConsole(url, method, status, responseData) {
-      consoleOutput.innerHTML = \`[HTTP] \${method} \${url}\\n[STATUS] \${status}\\n[RESPONSE]\\n\${JSON.stringify(responseData, null, 2)}\`;
+      consoleOutput.innerHTML = \`[HTTP] \\\${method} \\\${url}\\n[STATUS] \\\${status}\\n[RESPONSE]\\n\\\${JSON.stringify(responseData, null, 2)}\`;
       consoleOutput.scrollTop = 0;
     }
 
     async function loadFeaturedSongs() {
       songsGrid.innerHTML = Array(4).fill(0).map(() => \`
         <div class="song-card shimmer">
-          <div style="height: 0.95rem; width: 60%; background: rgba(0,0,0,0.05); margin-bottom: 0.5rem; border-radius: 4px;"></div>
-          <div style="height: 0.8rem; width: 40%; background: rgba(0,0,0,0.05); border-radius: 4px;"></div>
+          <div style="height: 0.95rem; width: 60%; background: rgba(0,0,0,0.08); margin-bottom: 0.5rem; border-radius: 4px;"></div>
+          <div style="height: 0.8rem; width: 40%; background: rgba(0,0,0,0.08); border-radius: 4px;"></div>
         </div>
       \`).join('');
 
@@ -690,16 +838,16 @@ export default `<!DOCTYPE html>
           allSongs = await res.json();
           renderSongs(allSongs);
         } else {
-          songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--color-ink-soft);">Failed to load cached songs.</p>';
+          songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--cream-dim); font-family: var(--font-mono);">Failed to load cached songs.</p>';
         }
       } catch (err) {
-        songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--color-ink-soft);">Error connecting to fallback worker.</p>';
+        songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--cream-dim); font-family: var(--font-mono);">Error connecting to fallback worker.</p>';
       }
     }
 
     function renderSongs(songs) {
       if (songs.length === 0) {
-        songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--color-ink-soft);">No songs found in database.</p>';
+        songsGrid.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--cream-dim); font-family: var(--font-mono);">No songs found in database.</p>';
         return;
       }
 
@@ -724,12 +872,12 @@ export default `<!DOCTYPE html>
     async function selectSong(id, name, artist) {
       name = decodeURIComponent(name);
       artist = decodeURIComponent(artist);
-      
+
       noSelection.classList.add('hidden');
       detailContainer.classList.remove('hidden');
       detailTitle.textContent = name;
       detailArtist.textContent = artist;
-      lyricsBody.innerHTML = \`<span style="color: var(--color-ink-soft)">Fetching lyrics...</span>\`;
+      lyricsBody.innerHTML = \`<span style="color: var(--cream-dim)">Fetching lyrics...</span>\`;
       canvasVideo.classList.add('hidden');
       canvasFallback.classList.remove('hidden');
       consoleOutput.textContent = "Initializing request...";
@@ -745,12 +893,12 @@ export default `<!DOCTYPE html>
           showToast("Lyrics fetched!");
           logConsole(\`https://mlc.kouzu.in\${targetUrl}\`, 'GET', lyricsRes.status, data);
         } else {
-          lyricsBody.innerHTML = \`<span style="color: var(--color-accent)">Failed to read file. Status \${lyricsRes.status}</span>\`;
+          lyricsBody.innerHTML = \`<span style="color: var(--red)">Failed to read file. Status \${lyricsRes.status}</span>\`;
           const errorData = await lyricsRes.json().catch(() => ({}));
           logConsole(\`https://mlc.kouzu.in\${targetUrl}\`, 'GET', lyricsRes.status, errorData);
         }
       } catch (e) {
-        lyricsBody.innerHTML = \`<span style="color: var(--color-accent)">Error loading lyrics.</span>\`;
+        lyricsBody.innerHTML = \`<span style="color: var(--red)">Error loading lyrics.</span>\`;
       }
 
       // Fetch canvas
@@ -780,7 +928,7 @@ export default `<!DOCTYPE html>
           renderSongs(allSongs);
           return;
         }
-        songsGrid.innerHTML = \`<div style="grid-column: 1/-1; text-align: center; color: var(--color-ink-soft);">Searching fallback db...</div>\`;
+        songsGrid.innerHTML = \`<div style="grid-column: 1/-1; text-align: center; color: var(--cream-dim); font-family: var(--font-mono);">Searching fallback db...</div>\`;
         try {
           const res = await fetch(\`/api/search?q=\${encodeURIComponent(query)}\`);
           if (res.ok) {
