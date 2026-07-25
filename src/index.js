@@ -40,8 +40,8 @@ export default {
         let rows;
         if (query) {
           rows = await conn.execute(
-            'SELECT id, name, artists, lyrics_sources, canvas_sources FROM songs WHERE name LIKE ? OR artists LIKE ? LIMIT ?',
-            [`%${query}%`, `%${query}%`, limit]
+            'SELECT id, name, artists, lyrics_sources, canvas_sources FROM songs WHERE id = ? OR name LIKE ? OR artists LIKE ? LIMIT ?',
+            [query, `%${query}%`, `%${query}%`, limit]
           );
         } else {
           // Return default/featured list
