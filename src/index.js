@@ -32,7 +32,25 @@ export default {
         });
       }
 
-      // 2. GET /api/search -> Search database
+      // 2. GET /api/stats -> Get stats from database
+      if (path === '/api/stats') {
+        const totalRows = await conn.execute('SELECT COUNT(*) as count FROM songs');
+        const lyricsRows = await conn.execute('SELECT COUNT(*) as count FROM songs WHERE lyrics_sources IS NOT NULL');
+        const canvasRows = await conn.execute('SELECT COUNT(*) as count FROM songs WHERE canvas_sources IS NOT NULL');
+        
+        return new Response(JSON.stringify({
+          total: totalRows[0]?.count || 0,
+          lyrics: lyricsRows[0]?.count || 0,
+          canvas: canvasRows[0]?.count || 0,
+        }), {
+          headers: {
+            'Content-Type': 'application/json',
+            ...corsHeaders
+          }
+        });
+      }
+
+      // 3. GET /api/search -> Search database
       if (path === '/api/search') {
         const query = url.searchParams.get('q') || '';
         const limit = parseInt(url.searchParams.get('limit') || '12', 10);
