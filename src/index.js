@@ -102,19 +102,38 @@ export default {
           });
         }
 
-        // Fetch from Hugging Face Bucket
-        const bucketId = env.BUCKET_ID || 'allnewuser/lyrics';
-        const hfToken = env.HF_TOKEN;
-        const hfUrl = `https://huggingface.co/buckets/${bucketId}/resolve/${videoId}.json`;
+        // Resolve base URL from lyrics_sources
+        const lyricsSrc = rows[0].lyrics_sources || "";
+        let urlId = 1;
+        let ext = "json";
+        if (lyricsSrc.includes(":")) {
+          const parts = lyricsSrc.split(":");
+          urlId = parseInt(parts[0], 10) || 1;
+          if (parts.length > 1) {
+            ext = parts[1];
+          }
+        }
+
+        const urlRows = await conn.execute(
+          'SELECT url FROM base_urls WHERE id = ? LIMIT 1',
+          [urlId]
+        );
+
+        let targetUrl;
+        if (urlRows && urlRows.length > 0) {
+          targetUrl = `${urlRows[0].url}/${videoId}.${ext}`;
+        } else {
+          targetUrl = `https://huggingface.co/buckets/${bucketId}/resolve/${videoId}.json`;
+        }
         
         const hfHeaders = {};
         if (hfToken) {
           hfHeaders['Authorization'] = `Bearer ${hfToken}`;
         }
 
-        const hfResponse = await fetch(hfUrl, { headers: hfHeaders });
+        const hfResponse = await fetch(targetUrl, { headers: hfHeaders });
         if (!hfResponse.ok) {
-          return new Response(JSON.stringify({ error: 'Failed to fetch lyrics from Hugging Face bucket' }), {
+          return new Response(JSON.stringify({ error: 'Failed to fetch lyrics from Hugging Face bucket/IA' }), {
             status: hfResponse.status,
             headers: { 'Content-Type': 'application/json', ...corsHeaders }
           });
@@ -153,8 +172,28 @@ export default {
         }
 
         const song = rows[0];
-        const bucketId = env.BUCKET_ID || 'allnewuser/lyrics';
-        const streamUrl = `https://huggingface.co/buckets/${bucketId}/resolve/canvas/${id}.mp4`;
+        const canvasSrc = song.canvas_sources || "";
+        let urlId = 2;
+        let ext = "mp4";
+        if (canvasSrc.includes(":")) {
+          const parts = canvasSrc.split(":");
+          urlId = parseInt(parts[0], 10) || 2;
+          if (parts.length > 1) {
+            ext = parts[1];
+          }
+        }
+
+        const urlRows = await conn.execute(
+          'SELECT url FROM base_urls WHERE id = ? LIMIT 1',
+          [urlId]
+        );
+
+        let streamUrl;
+        if (urlRows && urlRows.length > 0) {
+          streamUrl = `${urlRows[0].url}/${id}.${ext}`;
+        } else {
+          streamUrl = `https://huggingface.co/buckets/${bucketId}/resolve/canvas/${id}.mp4`;
+        }
 
         return new Response(JSON.stringify({
           id: id,
@@ -179,8 +218,35 @@ export default {
           });
         }
 
-        const bucketId = env.BUCKET_ID || 'allnewuser/lyrics';
-        const redirectUrl = `https://huggingface.co/buckets/${bucketId}/resolve/canvas/${videoId}.mp4`;
+        const rows = await conn.execute(
+          'SELECT canvas_sources FROM songs WHERE id = ? LIMIT 1',
+          [videoId]
+        );
+
+        let urlId = 2;
+        let ext = "mp4";
+        if (rows && rows.length > 0 && rows[0].canvas_sources) {
+          const canvasSrc = rows[0].canvas_sources;
+          if (canvasSrc.includes(":")) {
+            const parts = canvasSrc.split(":");
+            urlId = parseInt(parts[0], 10) || 2;
+            if (parts.length > 1) {
+              ext = parts[1];
+            }
+          }
+        }
+
+        const urlRows = await conn.execute(
+          'SELECT url FROM base_urls WHERE id = ? LIMIT 1',
+          [urlId]
+        );
+
+        let redirectUrl;
+        if (urlRows && urlRows.length > 0) {
+          redirectUrl = `${urlRows[0].url}/${videoId}.${ext}`;
+        } else {
+          redirectUrl = `https://huggingface.co/buckets/${bucketId}/resolve/canvas/${videoId}.mp4`;
+        }
         return Response.redirect(redirectUrl, 307);
       }
 
@@ -208,11 +274,27 @@ export default {
 
         const song = rows[0];
         const streamSrc = song.stream_sources || "";
+        let urlId = 3;
         let ext = "m4a";
         if (streamSrc.includes(":")) {
-          ext = streamSrc.split(":")[1];
+          const parts = streamSrc.split(":");
+          urlId = parseInt(parts[0], 10) || 3;
+          if (parts.length > 1) {
+            ext = parts[1];
+          }
         }
-        const streamUrl = `https://huggingface.co/buckets/shashwatIDR/stream/resolve/${id}.${ext}`;
+
+        const urlRows = await conn.execute(
+          'SELECT url FROM base_urls WHERE id = ? LIMIT 1',
+          [urlId]
+        );
+
+        let streamUrl;
+        if (urlRows && urlRows.length > 0) {
+          streamUrl = `${urlRows[0].url}/${id}.${ext}`;
+        } else {
+          streamUrl = `https://huggingface.co/buckets/shashwatIDR/stream/resolve/${id}.${ext}`;
+        }
 
         return new Response(JSON.stringify({
           id: id,
@@ -242,15 +324,30 @@ export default {
           [videoId]
         );
 
+        let urlId = 3;
         let ext = "m4a";
         if (rows && rows.length > 0 && rows[0].stream_sources) {
           const streamSrc = rows[0].stream_sources;
           if (streamSrc.includes(":")) {
-            ext = streamSrc.split(":")[1];
+            const parts = streamSrc.split(":");
+            urlId = parseInt(parts[0], 10) || 3;
+            if (parts.length > 1) {
+              ext = parts[1];
+            }
           }
         }
 
-        const redirectUrl = `https://huggingface.co/buckets/shashwatIDR/stream/resolve/${videoId}.${ext}`;
+        const urlRows = await conn.execute(
+          'SELECT url FROM base_urls WHERE id = ? LIMIT 1',
+          [urlId]
+        );
+
+        let redirectUrl;
+        if (urlRows && urlRows.length > 0) {
+          redirectUrl = `${urlRows[0].url}/${videoId}.${ext}`;
+        } else {
+          redirectUrl = `https://huggingface.co/buckets/shashwatIDR/stream/resolve/${videoId}.${ext}`;
+        }
         return Response.redirect(redirectUrl, 307);
       }
 
