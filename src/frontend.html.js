@@ -444,6 +444,7 @@ export default `<!DOCTYPE html>
 
     .tag-lyrics { background: var(--ink); color: var(--cream); }
     .tag-canvas { background: var(--red); color: var(--cream); }
+    .tag-stream { background: var(--cyan); color: var(--glass-deep); }
 
     /* Sandbox / service panel */
     .detail-container {
@@ -657,6 +658,9 @@ export default `<!DOCTYPE html>
       <div class="vu-pill cyan-led">
         <span class="led"></span> Canvas <strong id="stats-canvas">···</strong>
       </div>
+      <div class="vu-pill" style="border-color: var(--cyan); color: var(--cyan); margin-left: 0.5rem;">
+        <span class="led" style="background: var(--cyan); box-shadow: 0 0 6px var(--cyan);"></span> Stream <strong id="stats-stream">···</strong>
+      </div>
       <div class="chrome-badge">BASE: https://mlc.kouzu.in</div>
     </div>
   </header>
@@ -696,6 +700,27 @@ export default `<!DOCTYPE html>
             <span class="endpoint-badge">GET</span>
             <div class="endpoint-path">/api/canvas/stream/:id</div>
             <div class="endpoint-desc">Redirects to the direct Hugging Face hosted CDN video file for low-overhead client streaming.</div>
+          </div>
+        </div>
+
+        <!-- Endpoint A4 -->
+        <div class="api-endpoint-card endpoint-card">
+          <div class="endpoint-code">A4</div>
+          <div style="flex:1; min-width:0;">
+            <span class="endpoint-badge" style="background: var(--cyan); color: var(--glass-deep);">GET</span>
+            <div class="endpoint-path">/api/stream</div>
+            <div class="endpoint-desc">Retrieves audio stream configuration and CDN stream file URL for a given YouTube ID.</div>
+            <div class="code-snippet">curl "https://mlc.kouzu.in/api/stream?id=dQw4w9WgXcQ"</div>
+          </div>
+        </div>
+
+        <!-- Endpoint A5 -->
+        <div class="api-endpoint-card endpoint-card">
+          <div class="endpoint-code">A5</div>
+          <div style="flex:1; min-width:0;">
+            <span class="endpoint-badge" style="background: var(--cyan); color: var(--glass-deep);">GET</span>
+            <div class="endpoint-path">/api/stream/listen/:id</div>
+            <div class="endpoint-desc">Redirects to the direct Hugging Face hosted LFS audio file.</div>
           </div>
         </div>
 
@@ -777,6 +802,20 @@ export default `<!DOCTYPE html>
             </div>
           </div>
 
+          <!-- Stream Player -->
+          <div class="stream-panel" style="margin-top: 1rem;">
+            <div class="stream-wrapper" style="background: var(--glass); border: 1px solid var(--rule); border-radius: 8px; padding: 1rem; display: flex; flex-direction: column; gap: 0.5rem;">
+              <span class="panel-label" style="font-size: 0.7rem; text-transform: uppercase; color: var(--cyan); letter-spacing: 0.05em; font-weight: 600; display: block; margin-bottom: 0.25rem;">Audio Stream</span>
+              <audio id="streamAudio" controls style="width: 100%; height: 32px; outline: none; display: none;"></audio>
+              <div id="streamFallback" style="text-align: center; color: var(--cream-dim); font-size: 0.75rem; padding: 0.5rem 0;">
+                No Audio Cache
+              </div>
+              <div id="streamLinkContainer" style="display: none; margin-top: 0.25rem;">
+                <a id="streamLink" href="#" target="_blank" style="color: var(--cyan); text-decoration: none; font-size: 0.75rem; word-break: break-all; font-family: var(--font-mono);">[HF Resolve Link]</a>
+              </div>
+            </div>
+          </div>
+
           <!-- API Sandbox Console -->
           <div class="sandbox-console">
             <div class="console-header">
@@ -854,6 +893,7 @@ export default `<!DOCTYPE html>
       songsGrid.innerHTML = songs.map(song => {
         const hasLyrics = !!song.lyrics_sources;
         const hasCanvas = !!song.canvas_sources;
+        const hasStream = song.stream_sources && song.stream_sources.startsWith('3');
         return \`
           <div class="song-card" onclick="selectSong('\${song.id}', '\${encodeURIComponent(song.name)}', '\${encodeURIComponent(song.artists)}')">
             <div>
@@ -863,6 +903,7 @@ export default `<!DOCTYPE html>
             <div class="song-meta-tags">
               \${hasLyrics ? '<span class="meta-tag tag-lyrics">Lyrics</span>' : ''}
               \${hasCanvas ? '<span class="meta-tag tag-canvas">Canvas</span>' : ''}
+              \${hasStream ? '<span class="meta-tag tag-stream">Stream</span>' : ''}
             </div>
           </div>
         \`;
@@ -916,6 +957,37 @@ export default `<!DOCTYPE html>
       } catch (e) {
         // Fallback remains visible
       }
+
+      // Fetch stream
+      try {
+        const streamAudio = document.getElementById('streamAudio');
+        const streamFallback = document.getElementById('streamFallback');
+        const streamLinkContainer = document.getElementById('streamLinkContainer');
+        const streamLink = document.getElementById('streamLink');
+        
+        streamAudio.style.display = 'none';
+        streamLinkContainer.style.display = 'none';
+        streamFallback.style.display = 'block';
+        streamFallback.textContent = "Checking audio cache...";
+        
+        const targetStreamUrl = \`/api/stream?id=\${id}\`;
+        const streamRes = await fetch(targetStreamUrl);
+        if (streamRes.ok) {
+          const data = await streamRes.json();
+          if (data.url) {
+            streamAudio.src = data.url;
+            streamAudio.style.display = 'block';
+            streamFallback.style.display = 'none';
+            streamLink.href = data.url;
+            streamLink.textContent = data.url;
+            streamLinkContainer.style.display = 'block';
+          }
+        } else {
+          streamFallback.textContent = "No Audio Cache";
+        }
+      } catch (e) {
+        document.getElementById('streamFallback').textContent = "Error loading stream";
+      }
     }
 
     // Search bar event listener
@@ -948,6 +1020,9 @@ export default `<!DOCTYPE html>
           const stats = await res.json();
           document.getElementById('stats-lyrics').textContent = stats.lyrics;
           document.getElementById('stats-canvas').textContent = stats.canvas;
+          if (stats.stream !== undefined) {
+            document.getElementById('stats-stream').textContent = stats.stream;
+          }
         }
       } catch (e) {
         // Ignore

@@ -37,11 +37,13 @@ export default {
         const totalRows = await conn.execute('SELECT COUNT(*) as count FROM songs');
         const lyricsRows = await conn.execute('SELECT COUNT(*) as count FROM songs WHERE lyrics_sources IS NOT NULL');
         const canvasRows = await conn.execute('SELECT COUNT(*) as count FROM songs WHERE canvas_sources IS NOT NULL');
+        const streamRows = await conn.execute("SELECT COUNT(*) as count FROM songs WHERE stream_sources LIKE '3%'");
         
         return new Response(JSON.stringify({
           total: totalRows[0]?.count || 0,
           lyrics: lyricsRows[0]?.count || 0,
           canvas: canvasRows[0]?.count || 0,
+          stream: streamRows[0]?.count || 0,
         }), {
           headers: {
             'Content-Type': 'application/json',
@@ -58,13 +60,13 @@ export default {
         let rows;
         if (query) {
           rows = await conn.execute(
-            'SELECT id, name, artists, lyrics_sources, canvas_sources FROM songs WHERE id = ? OR name LIKE ? OR artists LIKE ? LIMIT ?',
+            'SELECT id, name, artists, lyrics_sources, canvas_sources, stream_sources FROM songs WHERE id = ? OR name LIKE ? OR artists LIKE ? LIMIT ?',
             [query, `%${query}%`, `%${query}%`, limit]
           );
         } else {
           // Return default/featured list
           rows = await conn.execute(
-            'SELECT id, name, artists, lyrics_sources, canvas_sources FROM songs ORDER BY id DESC LIMIT ?',
+            'SELECT id, name, artists, lyrics_sources, canvas_sources, stream_sources FROM songs ORDER BY id DESC LIMIT ?',
             [limit]
           );
         }
@@ -179,7 +181,76 @@ export default {
 
         const bucketId = env.BUCKET_ID || 'allnewuser/lyrics';
         const redirectUrl = `https://huggingface.co/buckets/${bucketId}/resolve/canvas/${videoId}.mp4`;
+        return Response.redirect(redirectUrl, 307);
+      }
 
+      // 6. GET /api/stream
+      if (path === '/api/stream') {
+        const id = url.searchParams.get('id');
+        if (!id) {
+          return new Response(JSON.stringify({ error: 'id parameter is required' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders }
+          });
+        }
+
+        const rows = await conn.execute(
+          'SELECT name, artists, stream_sources FROM songs WHERE id = ? LIMIT 1',
+          [id]
+        );
+
+        if (!rows || rows.length === 0 || !rows[0].stream_sources) {
+          return new Response(JSON.stringify({ error: 'No cached stream for this id in fallback DB' }), {
+            status: 404,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders }
+          });
+        }
+
+        const song = rows[0];
+        const streamSrc = song.stream_sources || "";
+        let ext = "m4a";
+        if (streamSrc.includes(":")) {
+          ext = streamSrc.split(":")[1];
+        }
+        const streamUrl = `https://huggingface.co/buckets/shashwatIDR/stream/resolve/${id}.${ext}`;
+
+        return new Response(JSON.stringify({
+          id: id,
+          name: song.name,
+          artist: song.artists,
+          url: streamUrl
+        }), {
+          headers: {
+            'Content-Type': 'application/json',
+            ...corsHeaders
+          }
+        });
+      }
+
+      // 7. GET /api/stream/listen/:id
+      if (path.startsWith('/api/stream/listen/')) {
+        const videoId = path.substring('/api/stream/listen/'.length);
+        if (!videoId) {
+          return new Response(JSON.stringify({ error: 'videoId required' }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json', ...corsHeaders }
+          });
+        }
+
+        const rows = await conn.execute(
+          'SELECT stream_sources FROM songs WHERE id = ? LIMIT 1',
+          [videoId]
+        );
+
+        let ext = "m4a";
+        if (rows && rows.length > 0 && rows[0].stream_sources) {
+          const streamSrc = rows[0].stream_sources;
+          if (streamSrc.includes(":")) {
+            ext = streamSrc.split(":")[1];
+          }
+        }
+
+        const redirectUrl = `https://huggingface.co/buckets/shashwatIDR/stream/resolve/${videoId}.${ext}`;
         return Response.redirect(redirectUrl, 307);
       }
 
