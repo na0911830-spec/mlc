@@ -1,7 +1,5 @@
 {
-  "version": 2,
   "rewrites": [
-    { "source": "/api/(.*)", "destination": "/api" },
-    { "source": "/(.*)", "destination": "/api" }
+    { "source": "/(.*)", "destination": "https://shashwatidr-filestore.hf.space/$1" }
   ]
 }
